@@ -1,0 +1,116 @@
+<div class="container">
+  <div class="containerTrip">
+    <h1><span class="regular">Weather </span> Forecast</h1>
+    <!-- пошук пїздки із переліку -->
+    <div>
+      <input
+        class="searchField"
+        type="search"
+        [(ngModel)]="searchText"
+        placeholder="Search your trip"
+      />
+      <!-- відображення знайденої пїздки із переліку та можливість видалити знайдену поїздку за потреби -->
+      <div *ngIf="searchText">
+        <div *ngFor="let city of filterCities()">
+          <h3>{{ city.name }}</h3>
+          <img [src]="city.photoUrl" alt="{{ city.name }}" />
+          <button (click)="removeCity(city.id)">Delete</button>
+        </div>
+      </div>
+    </div>
+    <!-- модальне вікно додавання поїздки-->
+    <div *ngIf="modalOpened" class="modal">
+      <div class="modal-content">
+        <div class="headerModal">
+          <h2>Create trip</h2>
+          <span class="close" (click)="closeModal()">&times;</span>
+        </div>
+        <div class="bodyModal">
+          <label><span class="redColor">*</span>City</label>
+          <select class="input" [(ngModel)]="selectedCity">
+            <option value="" disabled selected hidden>
+              Please select a city
+            </option>
+            <option *ngFor="let city of cities" [value]="city">
+              {{ city }}
+            </option>
+          </select>
+          <label><span class="redColor">*</span>Start date</label>
+          <input
+            class="input"
+            type="date"
+            [(ngModel)]="startDate"
+            [min]="minStartDate"
+            [max]="maxStartDate"
+          />
+          <label><span class="redColor">*</span>End date</label>
+          <input
+            class="input"
+            type="date"
+            [(ngModel)]="endDate"
+            [min]="minEndDate"
+            [max]="maxEndDate"
+          />
+        </div>
+        <div class="buttonModal">
+          <button class="buttonCancel" (click)="cancel()">Cancel</button>
+          <button class="buttonSave" (click)="addSelectedCity()">Save</button>
+        </div>
+      </div>
+    </div>
+    <!-- перелік доданих поїздок -->
+    <div class="tripsContainer">
+      <div *ngIf="startWindowCities.length > 0">
+        <div class="trips">
+          <div
+            class="trip"
+            *ngFor="let city of startWindowCities"
+            (click)="selectTrip(city)"
+          >
+            <img
+              class="city-photo"
+              [class.selected]="selectedTrip === city"
+              [src]="city.photoUrl"
+              alt="{{ city.name }}"
+            />
+            <h3 class="text">{{ city.name }}</h3>
+            <h5 class="text">
+              {{ formatDate(city.startDate) }} - {{ formatDate(city.endDate) }}
+            </h5>
+          </div>
+        </div>
+      </div>
+      <button class="addTrip" (click)="openModal()">
+        <span class="big">+</span><br />Add trip
+      </button>
+    </div>
+  </div>
+  <!-- таймер зворотнього відліку до вибраної похздки та погода на поточний день -->
+  <div class="containerTimer">
+    <div *ngIf="selectedTrip">
+      <div *ngIf="currentWeather">
+        <p class="centreText">
+          {{ currentWeather.days[0].datetime | date : "EEEE" }}
+        </p>
+        <p class="centreText">{{ currentWeather.days[0].temp }} °C</p>
+        <p class="centreText">{{ currentWeather.days[0].description }}</p>
+      </div>
+      <h2 class="centreText">{{ selectedTrip.name }}</h2>
+      <div class="timer">
+        <p class="timerItems">
+          {{ days }} <br /><span class="timerItemsText">DAYS</span>
+        </p>
+        <p class="timerItems">
+          {{ hours }} <br /><span class="timerItemsText">HOURS</span>
+        </p>
+        <p class="timerItems">
+          {{ minutes }} <br /><span class="timerItemsText">MINUTES</span>
+        </p>
+        <p class="timerItems">
+          {{ seconds }} <br /><span class="timerItemsText">SECONDS</span>
+        </p>
+        <p>{{ countdown }}</p>
+      </div>
+    </div>
+  </div>
+</div>
